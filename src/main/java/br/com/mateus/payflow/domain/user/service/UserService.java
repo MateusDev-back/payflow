@@ -18,11 +18,11 @@ public class UserService {
     @Transactional
     public UserEntity save(UserEntity user) {
         if (userRepository.existsByCpf(user.getCpf())) {
-            throw new RuntimeException("CPF already exists");
+            throw new IllegalArgumentException("CPF already exists");
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new IllegalArgumentException("Email already exists");
         }
 
         return userRepository.save(user);
