@@ -1,7 +1,10 @@
 package br.com.mateus.payflow.domain.user.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
 import jakarta.persistence.Column;
@@ -12,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Entity
@@ -28,19 +30,24 @@ public class UserEntity {
     private String name;
 
     @NotBlank
-    @CPF
+    @CPF(message = "Invalid CPF")
     @Column(nullable = false, unique = true)
     private String cpf;
 
     @NotBlank
-    @Email
+    @Email(message = "Invalid email")
     @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank
+    @Length(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
     private BigDecimal balance = BigDecimal.ZERO;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
