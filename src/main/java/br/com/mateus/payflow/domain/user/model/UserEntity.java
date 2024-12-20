@@ -1,7 +1,9 @@
 package br.com.mateus.payflow.domain.user.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -44,4 +46,8 @@ public class UserEntity {
 
     @Column(nullable = false)
     private BigDecimal balance = BigDecimal.ZERO;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
