@@ -7,9 +7,9 @@ import br.com.mateus.payflow.application.auth.dto.LoginResponseDTO;
 import br.com.mateus.payflow.application.auth.dto.UserLoginRequestDTO;
 import br.com.mateus.payflow.application.auth.service.AuthService;
 
-import javax.naming.AuthenticationException;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -21,8 +21,12 @@ public class AuthUserController {
     private AuthService authService;
 
     @PostMapping("/signin")
-    public LoginResponseDTO login(@RequestBody UserLoginRequestDTO userLoginRequestDTO) throws AuthenticationException {
-        return this.authService.execute(userLoginRequestDTO);
+    public ResponseEntity<Object> signin(@RequestBody UserLoginRequestDTO userLoginRequestDTO) {
+        try {
+            LoginResponseDTO loginResponseDTO = authService.execute(userLoginRequestDTO);
+            return ResponseEntity.ok(loginResponseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
-
 }

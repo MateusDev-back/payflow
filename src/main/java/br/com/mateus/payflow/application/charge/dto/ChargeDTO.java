@@ -1,7 +1,5 @@
 package br.com.mateus.payflow.application.charge.dto;
 
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

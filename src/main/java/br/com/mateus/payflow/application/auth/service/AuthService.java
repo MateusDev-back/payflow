@@ -1,5 +1,8 @@
 package br.com.mateus.payflow.application.auth.service;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,7 +43,8 @@ public class AuthService {
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         var token = JWT.create()
-                .withIssuer("identifier")
+                .withExpiresAt(Instant.now().plus(Duration.ofHours(2)))
+                .withIssuer("user_id")
                 .withSubject(user.getId().toString())
                 .sign(algorithm);
 
