@@ -24,25 +24,32 @@ public class ChargeService {
         this.userRepository = userRepository;
     }
 
-    public ChargeDTO createCharge(ChargeDTO chargeDTO) {
-        UserEntity payee = userRepository.findByCpf(chargeDTO.getPayee())
-                .orElseThrow(() -> new RuntimeException("Payee not found"));
+    public ChargeDTO createCharge(ChargeDTO chargeDTO, Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        chargeDTO.setPayee(user.getCpf());
 
         UserEntity payer = userRepository.findByCpf(chargeDTO.getPayer())
                 .orElseThrow(() -> new RuntimeException("Payer not found"));
 
+        if (user.getCpf().equals(payer.getCpf())) {
+            throw new RuntimeException("User cannot create a charge for themselves");
+        }
+
         validateChargeAmount(chargeDTO.getAmount());
 
-        ChargeEntity chargeEntity = buildChargeEntity(chargeDTO, payee, payer);
-
+        ChargeEntity chargeEntity = buildChargeEntity(chargeDTO, user, payer);
         chargeEntity = chargeRepository.save(chargeEntity);
 
         chargeDTO.setId(chargeEntity.getId());
-
         return new ChargeDTO(chargeEntity);
     }
 
-    public List<ChargeDTO> checkChargesSend(UserEntity payee, ChargeStatus status) {
+    public List<ChargeDTO> checkChargesSend(Long userId, ChargeStatus status) {
+        UserEntity payee = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         List<ChargeEntity> charges = (status == null)
                 ? chargeRepository.findByPayee(payee)
                 : chargeRepository.findByPayeeAndStatus(payee, status);
@@ -50,7 +57,10 @@ public class ChargeService {
         return mapToDTOList(charges);
     }
 
-    public List<ChargeDTO> checkChargesReceived(UserEntity payer, ChargeStatus status) {
+    public List<ChargeDTO> checkChargesReceived(Long userId, ChargeStatus status) {
+        UserEntity payer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         List<ChargeEntity> charges = (status == null)
                 ? chargeRepository.findByPayer(payer)
                 : chargeRepository.findByPayerAndStatus(payer, status);
