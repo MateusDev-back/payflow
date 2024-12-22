@@ -1,5 +1,11 @@
 package br.com.mateus.payflow.application.auth.service;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+
+import javax.naming.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,7 +33,7 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public LoginResponseDTO execute(UserLoginRequestDTO userLoginRequestDTO) {
+    public LoginResponseDTO execute(UserLoginRequestDTO userLoginRequestDTO) throws AuthenticationException {
         String identifier = userLoginRequestDTO.getLogin();
 
         UserEntity user = findUserByIdentifier(identifier);
@@ -40,7 +46,9 @@ public class AuthService {
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         var token = JWT.create()
-                .withIssuer("identifier")
+                .withIssuer("user_id")
+                .withExpiresAt(Instant.now().plus(Duration.ofHours(2)))
+                .withClaim("roles", Arrays.asList("USER"))
                 .withSubject(user.getId().toString())
                 .sign(algorithm);
 
