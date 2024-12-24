@@ -1,5 +1,6 @@
 package br.com.mateus.payflow.domain.charge.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,7 +27,7 @@ public class ChargeEntity {
     private UserEntity payer;
 
     @Column(nullable = false)
-    private Double amount;
+    private BigDecimal amount;
 
     private String description;
 

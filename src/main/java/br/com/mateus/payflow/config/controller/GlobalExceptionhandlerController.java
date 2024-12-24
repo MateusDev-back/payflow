@@ -48,4 +48,16 @@ public class GlobalExceptionhandlerController {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorMessageDTO> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorMessageDTO(ex.getMessage(), "general"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorMessageDTO> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorMessageDTO("An unexpected error occurred", "general"));
+    }
 }

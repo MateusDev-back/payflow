@@ -1,5 +1,7 @@
 package br.com.mateus.payflow.application.charge.dto;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,7 +27,7 @@ public class ChargeDTO {
 
     @NotNull
     @JsonProperty("amount")
-    private Double amount;
+    private BigDecimal amount;
 
     @JsonProperty("description")
     private String description;
@@ -36,7 +38,7 @@ public class ChargeDTO {
     @JsonCreator
     public ChargeDTO(@JsonProperty("payee") String payee,
             @JsonProperty("payer") String payer,
-            @JsonProperty("amount") Double amount,
+            @JsonProperty("amount") BigDecimal amount,
             @JsonProperty("description") String description,
             @JsonProperty("status") ChargeStatus status) {
         this.payee = payee;
