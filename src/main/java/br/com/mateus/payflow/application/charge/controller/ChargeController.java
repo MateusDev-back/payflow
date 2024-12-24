@@ -16,6 +16,7 @@ import br.com.mateus.payflow.enums.charge.ChargeStatus;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -73,10 +74,20 @@ public class ChargeController {
     public ResponseEntity<String> payCharge(@RequestParam String chargeId, HttpServletRequest request) {
         try {
             var userId = Long.parseLong(request.getAttribute("user_id").toString());
-            chargeService.payCharge(chargeId, userId); // Passando o userId para validar o pagamento
+            chargeService.payCharge(chargeId, userId);
             return ResponseEntity.status(HttpStatus.OK).body("Payment successful.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Payment failed: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{chargeId}")
+    public ResponseEntity<ChargeDTO> getCharge(@PathVariable String chargeId) {
+        try {
+            ChargeDTO charge = chargeService.getDetails(chargeId);
+            return ResponseEntity.ok(charge);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 }

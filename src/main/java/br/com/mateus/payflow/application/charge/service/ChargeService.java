@@ -13,4 +13,7 @@ public interface ChargeService {
     List<ChargeDTO> checkChargesSend(Long userId, ChargeStatus status);
 
     List<ChargeDTO> checkChargesReceived(Long userId, ChargeStatus status);
+
+    ChargeDTO getDetails(String chargeId);
+
 }

@@ -70,6 +70,14 @@ public class ChargeServiceImpl implements ChargeService {
         return mapToDTOList(charges);
     }
 
+    @Override
+    public ChargeDTO getDetails(String chargeId) {
+        ChargeEntity charge = chargeRepository.findById(chargeId)
+                .orElseThrow(() -> new RuntimeException("Charge not found"));
+
+        return new ChargeDTO(charge);
+    }
+
     private List<ChargeDTO> mapToDTOList(List<ChargeEntity> chargeEntities) {
         return chargeEntities.stream()
                 .map(ChargeDTO::new)
