@@ -1,5 +1,7 @@
 package br.com.mateus.payflow.application.charge.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +39,8 @@ public class ChargePaymentService {
         balanceService.debit(charge.getPayer(), charge.getAmount());
         balanceService.credit(charge.getPayee(), charge.getAmount());
 
-        // Atualiza o status da cobrança para "PAID"
         charge.setStatus(ChargeStatus.PAID);
+        charge.setPaymentDate(LocalDateTime.now());
         chargeRepository.save(charge);
     }
 }

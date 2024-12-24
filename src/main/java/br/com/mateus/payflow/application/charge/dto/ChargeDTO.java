@@ -1,6 +1,7 @@
 package br.com.mateus.payflow.application.charge.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,11 +30,15 @@ public class ChargeDTO {
     @JsonProperty("amount")
     private BigDecimal amount;
 
+    private LocalDateTime paymentDate;
+
     @JsonProperty("description")
     private String description;
 
     @JsonProperty("status")
     private ChargeStatus status;
+
+    private LocalDateTime createdAt;
 
     @JsonCreator
     public ChargeDTO(@JsonProperty("payee") String payee,
@@ -53,8 +58,12 @@ public class ChargeDTO {
         this.payee = charge.getPayee().getCpf();
         this.payer = charge.getPayer().getCpf();
         this.amount = charge.getAmount();
+        if (charge.getPaymentDate() != null) {
+            this.paymentDate = charge.getPaymentDate();
+        }
         this.description = charge.getDescription();
         this.status = charge.getStatus();
+        this.createdAt = charge.getCreatedAt();
     }
 
 }
