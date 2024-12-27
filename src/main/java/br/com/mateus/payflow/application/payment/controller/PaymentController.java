@@ -22,7 +22,7 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("payment_charge")
+    @PostMapping("/payment_charge")
     public ResponseEntity<PaymentResponseDTO> pay(@Valid @RequestBody PaymentRequestDTO paymentRequestDTO) {
         try {
             paymentService.payCharge(paymentRequestDTO.getChargeId(), paymentRequestDTO.getPaymentMethod());
