@@ -17,17 +17,14 @@ public class ChargeServiceImpl implements ChargeService {
 
     private final ChargeRepository chargeRepository;
     private final ChargeCreationService chargeCreationService;
-    private final ChargePaymentService chargePaymentService;
     private final UserRepository userRepository;
 
     @Autowired
     public ChargeServiceImpl(ChargeRepository chargeRepository,
             ChargeCreationService chargeCreationService,
-            ChargePaymentService chargePaymentService,
             UserRepository userRepository) {
         this.chargeRepository = chargeRepository;
         this.chargeCreationService = chargeCreationService;
-        this.chargePaymentService = chargePaymentService;
         this.userRepository = userRepository;
     }
 
@@ -39,11 +36,6 @@ public class ChargeServiceImpl implements ChargeService {
         ChargeEntity charge = chargeCreationService.createCharge(chargeDTO, user.getCpf());
         ChargeEntity savedCharge = chargeRepository.save(charge);
         return new ChargeDTO(savedCharge);
-    }
-
-    @Override
-    public void payCharge(String chargeId, Long userId) {
-        chargePaymentService.payCharge(chargeId, userId);
     }
 
     @Override

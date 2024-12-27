@@ -69,18 +69,6 @@ public class ChargeController {
         }
     }
 
-    @PostMapping("/pay")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> payCharge(@RequestParam String chargeId, HttpServletRequest request) {
-        try {
-            var userId = Long.parseLong(request.getAttribute("user_id").toString());
-            chargeService.payCharge(chargeId, userId);
-            return ResponseEntity.status(HttpStatus.OK).body("Payment successful.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Payment failed: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/{chargeId}")
     public ResponseEntity<ChargeDTO> getCharge(@PathVariable String chargeId) {
         try {
