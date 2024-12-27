@@ -1,5 +1,7 @@
 package br.com.mateus.payflow.application.payment.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import br.com.mateus.payflow.application.payment.factory.PaymentStrategyFactory;
@@ -38,6 +40,8 @@ public class PaymentService {
         if (strategy.pay(charge, charge.getPayer())) {
             userRepository.save(charge.getPayer());
             userRepository.save(charge.getPayee());
+            charge.setStatus(ChargeStatus.PAID);
+            charge.setPaymentDate(LocalDateTime.now());
             chargeRepository.save(charge);
         }
     }
