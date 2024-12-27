@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.mateus.payflow.common.dto.ErrorResponseDTO;
 import br.com.mateus.payflow.common.exception.CpfAlreadyExistsException;
@@ -27,6 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
+    @ResponseBody
     public ResponseEntity<ErrorResponseDTO> handleGeneralException(Exception ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Internal server error", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);

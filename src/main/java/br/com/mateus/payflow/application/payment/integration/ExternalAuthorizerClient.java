@@ -1,0 +1,25 @@
+package br.com.mateus.payflow.application.payment.integration;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import br.com.mateus.payflow.application.payment.dto.AuthorizerResponseDTO;
+
+@Component
+public class ExternalAuthorizerClient {
+
+    @Value("${external.authorizer.url}")
+    private String AUTORIZER_URL;
+
+    public boolean authorize() {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            AuthorizerResponseDTO response = restTemplate.getForObject(AUTORIZER_URL, AuthorizerResponseDTO.class);
+            return response != null && response.isAuthorized();
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Error communicating with external authorizer");
+        }
+    }
+}

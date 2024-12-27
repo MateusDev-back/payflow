@@ -3,6 +3,7 @@ package br.com.mateus.payflow.application.charge.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.mateus.payflow.application.charge.dto.ChargeDTO;
 import br.com.mateus.payflow.application.charge.service.ChargeService;
-import br.com.mateus.payflow.domain.user.repository.UserRepository;
 import br.com.mateus.payflow.enums.charge.ChargeStatus;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -26,7 +27,7 @@ public class ChargeController {
     private final ChargeService chargeService;
 
     @Autowired
-    public ChargeController(ChargeService chargeService, UserRepository userRepository) {
+    public ChargeController(ChargeService chargeService) {
         this.chargeService = chargeService;
     }
 
@@ -36,9 +37,9 @@ public class ChargeController {
         try {
             var userId = Long.parseLong(request.getAttribute("user_id").toString());
             ChargeDTO charge = chargeService.createCharge(chargeDTO, userId);
-            return ResponseEntity.ok(charge);
+            return ResponseEntity.status(HttpStatus.CREATED).body(charge);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -51,7 +52,7 @@ public class ChargeController {
             List<ChargeDTO> charges = chargeService.checkChargesSend(userId, status);
             return ResponseEntity.ok(charges);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -64,8 +65,17 @@ public class ChargeController {
             List<ChargeDTO> charges = chargeService.checkChargesReceived(userId, status);
             return ResponseEntity.ok(charges);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+    @GetMapping("/{chargeId}")
+    public ResponseEntity<ChargeDTO> getCharge(@PathVariable String chargeId) {
+        try {
+            ChargeDTO charge = chargeService.getDetails(chargeId);
+            return ResponseEntity.ok(charge);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 }
