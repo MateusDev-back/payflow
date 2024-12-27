@@ -19,6 +19,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByEmail(String email);
 
+    Optional<UserEntity> findById(Long id);
+
     @Modifying
     @Query("UPDATE UserEntity u SET u.balance = :balance WHERE u.id = :userId")
     void updateBalance(@Param("userId") Long userId, @Param("balance") BigDecimal balance);
