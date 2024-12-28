@@ -1,5 +1,6 @@
 package br.com.mateus.payflow.common;
 
+import br.com.mateus.payflow.common.exception.CreditCardValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,9 +24,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidationException(ValidationException ex) {
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO("Validation error", ex.getMessage());
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO("Validation failed", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
@@ -44,5 +46,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Conflict", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CreditCardValidationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCreditCardValidationException(CreditCardValidationException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO("Credit card validation failed", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

@@ -18,14 +18,14 @@ import jakarta.validation.ConstraintViolationException;
 @ControllerAdvice
 public class GlobalExceptionhandlerController {
 
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     public GlobalExceptionhandlerController(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<ErrorMessageDTO>> handlerMethodArgumentNotValidExceptioEntity(
+    public ResponseEntity<List<ErrorMessageDTO>> handlerMethodArgumentNotValidExceptionEntity(
             MethodArgumentNotValidException ex) {
         List<ErrorMessageDTO> dto = new ArrayList<>();
 

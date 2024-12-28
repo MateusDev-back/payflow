@@ -6,7 +6,6 @@ import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerC
 import br.com.mateus.payflow.application.payment.strategy.PaymentStrategy;
 import br.com.mateus.payflow.domain.charge.model.ChargeEntity;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
-import br.com.mateus.payflow.enums.charge.ChargeStatus;
 
 @Service
 public class CreditCardPaymentStrategy implements PaymentStrategy {
@@ -22,7 +21,6 @@ public class CreditCardPaymentStrategy implements PaymentStrategy {
         boolean authorized = externalAuthorizerClient.authorize();
         if (authorized) {
             charge.getPayee().setBalance(charge.getPayee().getBalance().add(charge.getAmount()));
-            charge.setStatus(ChargeStatus.PAID);
             return true;
         }
         throw new RuntimeException("Payment not authorized");
