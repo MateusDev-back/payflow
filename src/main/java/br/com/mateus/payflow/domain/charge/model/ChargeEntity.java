@@ -3,6 +3,7 @@ package br.com.mateus.payflow.domain.charge.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import br.com.mateus.payflow.enums.payment.PaymentMethod;
 import org.hibernate.annotations.CreationTimestamp;
 
 import br.com.mateus.payflow.domain.user.model.UserEntity;
@@ -36,6 +37,9 @@ public class ChargeEntity {
 
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
+
+    @Column(name = "method_payment")
+    private PaymentMethod paymentMethod;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -8,6 +8,8 @@ import br.com.mateus.payflow.enums.charge.ChargeStatus;
 public interface ChargeService {
     ChargeDTO createCharge(ChargeDTO chargeDTO, Long userId);
 
+    ChargeDTO cancelCharge(String chargeId, Long userId);
+
     List<ChargeDTO> checkChargesSend(Long userId, ChargeStatus status);
 
     List<ChargeDTO> checkChargesReceived(Long userId, ChargeStatus status);

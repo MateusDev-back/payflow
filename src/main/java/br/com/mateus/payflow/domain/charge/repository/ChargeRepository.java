@@ -28,5 +28,8 @@ public interface ChargeRepository extends JpaRepository<ChargeEntity, String> {
 
     Optional<ChargeEntity> findById(String id);
 
+    @Query("SELECT c FROM ChargeEntity c JOIN c.payee p WHERE c.id = :id AND p.id = :payerId")
+    Optional<ChargeEntity> findByIdAndPayerId(@Param("id") String id, @Param("payerId") Long payerId);
+
     List<ChargeEntity> findByStatus(ChargeStatus status);
 }

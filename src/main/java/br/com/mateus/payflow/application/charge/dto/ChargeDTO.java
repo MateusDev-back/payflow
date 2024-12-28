@@ -18,52 +18,53 @@ public class ChargeDTO {
     @JsonProperty("id")
     private String id;
 
+    @JsonProperty("payerCpf")
     @NotBlank
-    @JsonProperty("payee")
-    private String payee;
+    private String payerCpf;
 
-    @NotBlank
-    @JsonProperty("payer")
-    private String payer;
-
-    @NotNull
     @JsonProperty("amount")
+    @NotNull
     private BigDecimal amount;
 
-    private LocalDateTime paymentDate;
-
-    @JsonProperty("description")
     private String description;
+
+    private LocalDateTime paymentDate;
 
     @JsonProperty("status")
     private ChargeStatus status;
 
+    @JsonProperty("paymentMethod")
+    private String paymentMethod;
+
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
+    private LocalDateTime updatedAt;
+
     @JsonCreator
-    public ChargeDTO(@JsonProperty("payee") String payee,
-            @JsonProperty("payer") String payer,
+    public ChargeDTO(
+            @JsonProperty("payerCpf") String payerCpf,
             @JsonProperty("amount") BigDecimal amount,
-            @JsonProperty("description") String description,
-            @JsonProperty("status") ChargeStatus status) {
-        this.payee = payee;
-        this.payer = payer;
+            @JsonProperty("description") String description) {
+        this.payerCpf = payerCpf;
         this.amount = amount;
         this.description = description;
-        this.status = status;
     }
 
     public ChargeDTO(ChargeEntity charge) {
         this.id = charge.getId();
-        this.payee = charge.getPayee().getCpf();
-        this.payer = charge.getPayer().getCpf();
+        this.payerCpf = charge.getPayer().getCpf();
         this.amount = charge.getAmount();
         if (charge.getPaymentDate() != null) {
             this.paymentDate = charge.getPaymentDate();
         }
         this.description = charge.getDescription();
         this.status = charge.getStatus();
+        if (charge.getPaymentMethod() != null) {
+            this.paymentMethod = charge.getPaymentMethod().name();
+        }
         this.createdAt = charge.getCreatedAt();
+        this.updatedAt = charge.getUpdatedAt();
     }
 
 }
