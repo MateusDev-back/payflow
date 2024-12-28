@@ -58,6 +58,6 @@ public class GlobalExceptionhandlerController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorMessageDTO> handleGenericException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorMessageDTO("An unexpected error occurred", "general"));
+                .body(new ErrorMessageDTO("An unexpected error occurred", ex.getMessage()));
     }
 }

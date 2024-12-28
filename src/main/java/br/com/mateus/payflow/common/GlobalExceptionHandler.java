@@ -1,6 +1,6 @@
 package br.com.mateus.payflow.common;
 
-import br.com.mateus.payflow.common.exception.CreditCardValidationException;
+import br.com.mateus.payflow.common.exception.payment.CreditCardValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.mateus.payflow.common.dto.ErrorResponseDTO;
-import br.com.mateus.payflow.common.exception.CpfAlreadyExistsException;
-import br.com.mateus.payflow.common.exception.EmailAlreadyExistsException;
+import br.com.mateus.payflow.common.exception.user.CpfAlreadyExistsException;
+import br.com.mateus.payflow.common.exception.user.EmailAlreadyExistsException;
 import br.com.mateus.payflow.common.exception.ValidationException;
 
 @ControllerAdvice

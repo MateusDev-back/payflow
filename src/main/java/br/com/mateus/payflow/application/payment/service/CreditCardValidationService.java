@@ -1,7 +1,7 @@
 package br.com.mateus.payflow.application.payment.service;
 
 import br.com.mateus.payflow.application.payment.dto.CreditCardDTO;
-import br.com.mateus.payflow.common.exception.CreditCardValidationException;
+import br.com.mateus.payflow.common.exception.payment.CreditCardValidationException;
 import org.springframework.stereotype.Service;
 
 @Service

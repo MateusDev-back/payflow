@@ -1,6 +1,6 @@
 package br.com.mateus.payflow.application.payment.controller;
 
-import br.com.mateus.payflow.common.exception.CreditCardValidationException;
+import br.com.mateus.payflow.common.exception.payment.CreditCardValidationException;
 import br.com.mateus.payflow.enums.payment.PaymentMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
