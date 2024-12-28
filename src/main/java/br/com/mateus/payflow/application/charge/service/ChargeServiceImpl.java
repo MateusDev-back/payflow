@@ -17,25 +17,29 @@ public class ChargeServiceImpl implements ChargeService {
 
     private final ChargeRepository chargeRepository;
     private final ChargeCreationService chargeCreationService;
+    private final ChargeCancelationService chargeCancelationService;
     private final UserRepository userRepository;
 
     @Autowired
     public ChargeServiceImpl(ChargeRepository chargeRepository,
-            ChargeCreationService chargeCreationService,
-            UserRepository userRepository) {
+                             ChargeCreationService chargeCreationService, ChargeCancelationService chargeCancelationService,
+                             UserRepository userRepository) {
         this.chargeRepository = chargeRepository;
         this.chargeCreationService = chargeCreationService;
+        this.chargeCancelationService = chargeCancelationService;
         this.userRepository = userRepository;
     }
 
     @Override
     public ChargeDTO createCharge(ChargeDTO chargeDTO, Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        ChargeEntity charge = chargeCreationService.createCharge(chargeDTO, user.getCpf());
+        ChargeEntity charge = chargeCreationService.createCharge(chargeDTO, userId);
         ChargeEntity savedCharge = chargeRepository.save(charge);
         return new ChargeDTO(savedCharge);
+    }
+
+    @Override
+    public ChargeDTO cancelCharge(String chargeId, Long userId) {
+        return chargeCancelationService.cancelCharge(chargeId, userId);
     }
 
     @Override
@@ -75,5 +79,4 @@ public class ChargeServiceImpl implements ChargeService {
                 .map(ChargeDTO::new)
                 .toList();
     }
-
 }

@@ -36,12 +36,18 @@ public class PaymentService {
             throw new RuntimeException("Charge already paid");
         }
 
+        if (charge.getStatus() == ChargeStatus.CANCELED) {
+            throw new RuntimeException("Charge already canceled");
+        }
+
         PaymentStrategy strategy = paymentStrategyFactory.getPaymentStrategy(method);
         if (strategy.pay(charge, charge.getPayer())) {
             userRepository.save(charge.getPayer());
             userRepository.save(charge.getPayee());
             charge.setStatus(ChargeStatus.PAID);
+            charge.setPaymentMethod(PaymentMethod.valueOf(method.name()));
             charge.setPaymentDate(LocalDateTime.now());
+            charge.setUpdatedAt(LocalDateTime.now());
             chargeRepository.save(charge);
         }
     }

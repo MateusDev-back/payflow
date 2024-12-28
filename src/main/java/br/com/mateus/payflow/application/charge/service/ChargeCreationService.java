@@ -21,16 +21,14 @@ public class ChargeCreationService {
         this.userRepository = userRepository;
     }
 
-    public ChargeEntity createCharge(ChargeDTO dto, String cpf) {
-        UserEntity payee = userRepository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Payee not found"));
+    public ChargeEntity createCharge(ChargeDTO dto, Long payeeId) {
+        UserEntity payee = userRepository.findById(payeeId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        dto.setPayee(payee.getCpf());
-
-        UserEntity payer = userRepository.findByCpf(dto.getPayer())
+        UserEntity payer = userRepository.findByCpf(dto.getPayerCpf())
                 .orElseThrow(() -> new RuntimeException("Payer not found"));
 
-        if (payee.getCpf().equals(payer.getCpf())) {
+        if (payee.getId().equals(payer.getId())) {
             throw new RuntimeException("User cannot create a charge for themselves");
         }
 
