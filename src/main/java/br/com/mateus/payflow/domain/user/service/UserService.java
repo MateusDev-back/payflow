@@ -31,11 +31,11 @@ public class UserService {
 
     private void validateUser(UserEntity user) {
         if (userRepository.existsByCpf(user.getCpf())) {
-            throw new CpfAlreadyExistsException("CPF already exists");
+            throw new CpfAlreadyExistsException();
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already exists");
+            throw new EmailAlreadyExistsException();
         }
     }
 }

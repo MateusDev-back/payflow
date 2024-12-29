@@ -4,11 +4,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 
-import javax.naming.AuthenticationException;
-
+import br.com.mateus.payflow.common.exception.auth.CredentialsInvalidsException;
+import br.com.mateus.payflow.common.exception.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 import br.com.mateus.payflow.application.auth.dto.LoginResponseDTO;
 import br.com.mateus.payflow.application.auth.dto.UserLoginRequestDTO;
-import br.com.mateus.payflow.common.exception.ValidationException;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
 
@@ -25,15 +23,19 @@ import br.com.mateus.payflow.domain.user.repository.UserRepository;
 public class AuthService {
 
     @Value("${security.token.secret}")
-    private String secretKey;
+    public String secretKey;
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public LoginResponseDTO execute(UserLoginRequestDTO userLoginRequestDTO) throws AuthenticationException {
+    @Autowired
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public LoginResponseDTO execute(UserLoginRequestDTO userLoginRequestDTO) {
         String identifier = userLoginRequestDTO.getLogin();
 
         UserEntity user = findUserByIdentifier(identifier);
@@ -41,7 +43,7 @@ public class AuthService {
         boolean isPasswordValid = passwordEncoder.matches(userLoginRequestDTO.getPassword(), user.getPassword());
 
         if (!isPasswordValid) {
-            throw new BadCredentialsException("Invalid credentials");
+            throw new CredentialsInvalidsException();
         }
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
@@ -58,10 +60,10 @@ public class AuthService {
     private UserEntity findUserByIdentifier(String identifier) {
         if (identifier.contains("@")) {
             return userRepository.findByEmail(identifier)
-                    .orElseThrow(() -> new ValidationException("User not found"));
+                    .orElseThrow(UserNotFoundException::new);
         } else {
             return userRepository.findByCpf(identifier)
-                    .orElseThrow(() -> new ValidationException("User not found"));
+                    .orElseThrow(UserNotFoundException::new);
         }
     }
 }

@@ -21,6 +21,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/payflow/v1/users/charges")
 public class ChargeController {
 
+    private static final String SUCCESS = "success";
+    private static final String ERROR = "error";
+    private static final String CHARGE_CREATED_SUCCESSFULLY = "Charge created successfully";
+    private static final String CHARGE_CANCELED_SUCCESSFULLY = "Charge canceled successfully";
+    private static final String USER_ID = "user_id";
+
     private final ChargeService chargeService;
 
     @Autowired
@@ -32,12 +38,12 @@ public class ChargeController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ChargeCreateResponseDTO> createCharge(@Valid @RequestBody ChargeDTO chargeDTO, HttpServletRequest request) {
         try {
-            String userId = (String) request.getAttribute("user_id");
-            ChargeDTO charge = chargeService.createCharge(chargeDTO, Long.parseLong(userId));
-            ChargeCreateResponseDTO response = new ChargeCreateResponseDTO("success", "Charge created successfully");
+            String userId = (String) request.getAttribute(USER_ID);
+            chargeService.createCharge(chargeDTO, Long.parseLong(userId));
+            ChargeCreateResponseDTO response = new ChargeCreateResponseDTO(SUCCESS, CHARGE_CREATED_SUCCESSFULLY);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ChargeCreateResponseDTO response = new ChargeCreateResponseDTO("error", e.getMessage());
+            ChargeCreateResponseDTO response = new ChargeCreateResponseDTO( ERROR, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -46,12 +52,12 @@ public class ChargeController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ChargeCancelationResponseDTO> cancelCharge(@Valid @RequestBody ChargeCancelationRequestDTO request, HttpServletRequest httpRequest) {
         try {
-            String userId = (String) httpRequest.getAttribute("user_id");
+            String userId = (String) httpRequest.getAttribute(USER_ID);
             chargeService.cancelCharge(request.getChargeId(), Long.parseLong(userId));
-            ChargeCancelationResponseDTO response = new ChargeCancelationResponseDTO("success", "Charge canceled successfully");
+            ChargeCancelationResponseDTO response = new ChargeCancelationResponseDTO(SUCCESS, CHARGE_CANCELED_SUCCESSFULLY);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ChargeCancelationResponseDTO response = new ChargeCancelationResponseDTO("error", e.getMessage());
+            ChargeCancelationResponseDTO response = new ChargeCancelationResponseDTO(ERROR, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -62,7 +68,7 @@ public class ChargeController {
     public ResponseEntity<List<ChargeDTO>> checkSentCharges(HttpServletRequest request,
             @RequestParam(required = false) ChargeStatus status) {
         try {
-            var userId = Long.parseLong(request.getAttribute("user_id").toString());
+            var userId = Long.parseLong(request.getAttribute(USER_ID).toString());
             List<ChargeDTO> charges = chargeService.checkChargesSend(userId, status);
             return ResponseEntity.ok(charges);
         } catch (Exception e) {
@@ -75,7 +81,7 @@ public class ChargeController {
     public ResponseEntity<List<ChargeDTO>> checkReceivedCharges(HttpServletRequest request,
             @RequestParam(required = false) ChargeStatus status) {
         try {
-            var userId = Long.parseLong(request.getAttribute("user_id").toString());
+            var userId = Long.parseLong(request.getAttribute(USER_ID).toString());
             List<ChargeDTO> charges = chargeService.checkChargesReceived(userId, status);
             return ResponseEntity.ok(charges);
         } catch (Exception e) {

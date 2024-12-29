@@ -21,9 +21,6 @@ public class BalanceService implements UserBalanceRepository {
 
     @Override
     public void debit(UserEntity user, BigDecimal amount) {
-        if (user.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance");
-        }
 
         user.setBalance(user.getBalance().subtract(amount));
         userRepository.save(user);
