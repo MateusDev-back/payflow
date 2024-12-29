@@ -2,7 +2,7 @@ package br.com.mateus.payflow.application.auth.service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.List;
 
 import br.com.mateus.payflow.common.exception.auth.CredentialsInvalidsException;
 import br.com.mateus.payflow.common.exception.user.UserNotFoundException;
@@ -25,9 +25,9 @@ public class AuthService {
     @Value("${security.token.secret}")
     public String secretKey;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -50,7 +50,7 @@ public class AuthService {
         var token = JWT.create()
                 .withIssuer("user_id")
                 .withExpiresAt(Instant.now().plus(Duration.ofHours(2)))
-                .withClaim("roles", Arrays.asList("USER"))
+                .withClaim("roles", List.of("USER"))
                 .withSubject(user.getId().toString())
                 .sign(algorithm);
 
