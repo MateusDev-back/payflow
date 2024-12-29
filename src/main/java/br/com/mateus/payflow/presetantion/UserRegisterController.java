@@ -1,11 +1,13 @@
 package br.com.mateus.payflow.presetantion;
 
+import br.com.mateus.payflow.application.user.dto.UserResponseDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.mateus.payflow.application.user.dto.UserRegisterRequestDTO;
 import br.com.mateus.payflow.application.user.mapper.UserMapper;
-import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.application.user.service.UserRegisterService;
 import jakarta.validation.Valid;
 
@@ -23,7 +25,8 @@ public class UserRegisterController {
     }
 
     @PostMapping("/signup")
-    public UserEntity register(@Valid @RequestBody UserRegisterRequestDTO dto) {
-        return userRegisterService.save(UserMapper.toEntity(dto));
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRegisterRequestDTO dto) {
+        UserResponseDTO response = userRegisterService.save(UserMapper.toEntity(dto));
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

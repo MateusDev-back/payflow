@@ -8,6 +8,7 @@ import br.com.mateus.payflow.common.exception.user.CpfAlreadyExistsException;
 import br.com.mateus.payflow.common.exception.user.EmailAlreadyExistsException;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
+import br.com.mateus.payflow.application.user.dto.UserResponseDTO;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -23,10 +24,11 @@ public class UserRegisterService {
     }
 
     @Transactional
-    public UserEntity save(UserEntity user) {
+    public UserResponseDTO save(UserEntity user) {
         validateUser(user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new UserResponseDTO("success", "User created successfully");
     }
 
     private void validateUser(UserEntity user) {
