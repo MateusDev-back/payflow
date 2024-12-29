@@ -2,6 +2,10 @@ package br.com.mateus.payflow.application.charge.service;
 
 import java.math.BigDecimal;
 
+import br.com.mateus.payflow.common.exception.charge.InvalidChargeAmountException;
+import br.com.mateus.payflow.common.exception.user.PayerNotFoundException;
+import br.com.mateus.payflow.common.exception.user.UserException;
+import br.com.mateus.payflow.common.exception.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +27,13 @@ public class ChargeCreationService {
 
     public ChargeEntity createCharge(ChargeDTO dto, Long payeeId) {
         UserEntity payee = userRepository.findById(payeeId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         UserEntity payer = userRepository.findByCpf(dto.getPayerCpf())
-                .orElseThrow(() -> new RuntimeException("Payer not found"));
+                .orElseThrow(PayerNotFoundException::new);
 
         if (payee.getId().equals(payer.getId())) {
-            throw new RuntimeException("User cannot create a charge for themselves");
+            throw new UserException("User cannot create a charge for themselves");
         }
 
         validateChargeAmount(dto.getAmount());
@@ -39,7 +43,7 @@ public class ChargeCreationService {
 
     private void validateChargeAmount(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Charge amount must be greater than zero");
+            throw new InvalidChargeAmountException();
         }
     }
 

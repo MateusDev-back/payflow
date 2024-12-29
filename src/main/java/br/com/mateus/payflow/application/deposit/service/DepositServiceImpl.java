@@ -2,8 +2,9 @@ package br.com.mateus.payflow.application.deposit.service;
 
 import br.com.mateus.payflow.application.deposit.dto.DepositDTO;
 import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
-import br.com.mateus.payflow.common.exception.deposit.DepositException;
-import br.com.mateus.payflow.common.exception.user.UserException;
+import br.com.mateus.payflow.common.exception.authorizer.ExternalAuthorizerDepositException;
+import br.com.mateus.payflow.common.exception.deposit.DepositAmountInvalidException;
+import br.com.mateus.payflow.common.exception.user.UserNotFoundException;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,12 @@ public class DepositServiceImpl implements DepositService {
     @Override
     public DepositDTO createDeposit(DepositDTO dto, Long userId) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         validateDepositAmount(dto.getAmount());
 
         if (!externalAuthorizerClient.authorize()) {
-            throw new DepositException("Error authorizing deposit");
+            throw new ExternalAuthorizerDepositException();
         }
 
         user.setBalance(user.getBalance().add(dto.getAmount()));
@@ -41,7 +42,7 @@ public class DepositServiceImpl implements DepositService {
 
     private void validateDepositAmount(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new DepositException("Deposit amount must be greater than zero");
+            throw new DepositAmountInvalidException();
         }
     }
 }

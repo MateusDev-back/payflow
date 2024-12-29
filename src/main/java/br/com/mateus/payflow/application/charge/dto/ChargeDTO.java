@@ -10,9 +10,13 @@ import br.com.mateus.payflow.domain.charge.model.ChargeEntity;
 import br.com.mateus.payflow.enums.charge.ChargeStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChargeDTO {
 
     @JsonProperty("id")

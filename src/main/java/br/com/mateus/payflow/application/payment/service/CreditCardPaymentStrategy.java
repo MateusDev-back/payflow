@@ -1,5 +1,6 @@
 package br.com.mateus.payflow.application.payment.service;
 
+import br.com.mateus.payflow.common.exception.authorizer.ExternalAuthorizerPaymentException;
 import org.springframework.stereotype.Service;
 
 import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
@@ -23,7 +24,7 @@ public class CreditCardPaymentStrategy implements PaymentStrategy {
             charge.getPayee().setBalance(charge.getPayee().getBalance().add(charge.getAmount()));
             return true;
         }
-        throw new RuntimeException("Payment not authorized");
+        throw new ExternalAuthorizerPaymentException();
     }
 
 }
