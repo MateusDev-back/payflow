@@ -1,6 +1,8 @@
 package br.com.mateus.payflow.common;
 
 import br.com.mateus.payflow.common.exception.payment.CreditCardValidationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,6 +14,8 @@ import br.com.mateus.payflow.common.dto.ErrorResponseDTO;
 import br.com.mateus.payflow.common.exception.user.CpfAlreadyExistsException;
 import br.com.mateus.payflow.common.exception.user.EmailAlreadyExistsException;
 import br.com.mateus.payflow.common.exception.ValidationException;
+
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +32,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleConstraintViolationException(ConstraintViolationException ex) {
+        String violations = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO("error", violations);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
