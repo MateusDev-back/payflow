@@ -2,6 +2,7 @@ package br.com.mateus.payflow.application.charge.service;
 
 import br.com.mateus.payflow.application.balance.service.BalanceService;
 import br.com.mateus.payflow.application.charge.dto.ChargeDTO;
+import br.com.mateus.payflow.common.exception.charge.ChargeStatusException;
 import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
@@ -40,7 +41,7 @@ public class ChargeCancelationService {
 
 
         if (ChargeStatus.CANCELED == charge.getStatus()) {
-            throw new ChargeException("Charge already canceled");
+            throw new ChargeStatusException("Charge already canceled");
         }
 
         switch (charge.getStatus()) {

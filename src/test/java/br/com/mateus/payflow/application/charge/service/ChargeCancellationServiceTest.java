@@ -1,6 +1,7 @@
 package br.com.mateus.payflow.application.charge.service;
 
 import br.com.mateus.payflow.application.balance.service.BalanceService;
+import br.com.mateus.payflow.common.exception.charge.ChargeStatusException;
 import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
@@ -101,7 +102,8 @@ class ChargeCancellationServiceTest {
         charge.setStatus(ChargeStatus.CANCELED);
         when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
 
-        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
+        assertThrows(ChargeStatusException.class,
+                () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
     }
 
 
@@ -114,7 +116,7 @@ class ChargeCancellationServiceTest {
         chargeCancelationService.cancelCharge(charge.getId(), payee.getId());
 
         assertEquals(ChargeStatus.CANCELED, charge.getStatus());
-        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
+        assertThrows(ChargeStatusException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
     }
 
     @Test
