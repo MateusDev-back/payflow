@@ -2,7 +2,7 @@ package br.com.mateus.payflow.application.charge.service;
 
 import br.com.mateus.payflow.application.balance.service.BalanceService;
 import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
-import br.com.mateus.payflow.common.exception.balance.BalanceNoBalanceException;
+import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotAuthorizedException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotFoundException;
@@ -11,6 +11,7 @@ import br.com.mateus.payflow.domain.charge.repository.ChargeRepository;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.enums.charge.ChargeStatus;
 import br.com.mateus.payflow.enums.payment.PaymentMethod;
+import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,27 +47,34 @@ class ChargeCancellationServiceTest {
 
     @BeforeEach
     void setUp() {
+        Faker faker = new Faker();
+
+        Long payeeId = faker.number().randomNumber();
+        Long payerId = faker.number().randomNumber();
+
+        String chargeId = faker.internet().uuid();
+
         payer = new UserEntity();
-        payer.setId(18L);
-        payer.setName("Teste 123");
-        payer.setCpf("12345678900");
-        payer.setEmail("teste123@gmail.com");
-        payer.setPassword("123456");
+        payer.setId(payeeId);
+        payer.setName(faker.name().fullName());
+        payer.setCpf(faker.number().digits(11));
+        payer.setEmail(faker.internet().emailAddress());
+        payer.setPassword(faker.internet().password());
         payer.setBalance(BigDecimal.valueOf(1000.0));
         payer.setCreatedAt(LocalDateTime.now());
 
 
         payee = new UserEntity();
-        payee.setId(50L);
-        payee.setName("Teste 456");
-        payee.setCpf("98765432100");
-        payee.setEmail("teste321@hotmail.com");
-        payee.setPassword("654321");
+        payee.setId(payerId);
+        payee.setName(faker.name().fullName());
+        payee.setCpf(faker.number().digits(11));
+        payee.setEmail(faker.internet().emailAddress());
+        payee.setPassword(faker.internet().password());
         payer.setBalance(BigDecimal.valueOf(1000.0));
         payee.setCreatedAt(LocalDateTime.now());
 
         charge = new ChargeEntity();
-        charge.setId("charge123");
+        charge.setId(chargeId);
         charge.setAmount(BigDecimal.valueOf(100.0));
         charge.setPayee(payee);
         charge.setPayer(payer);
@@ -76,24 +84,24 @@ class ChargeCancellationServiceTest {
 
     @Test
     void testCancelCharge_whenChargeNotFound_shouldThrowChargeNotFoundException() {
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.empty());
+        when(chargeRepository.findById("Teste123")).thenReturn(Optional.empty());
 
-        assertThrows(ChargeNotFoundException.class, () -> chargeCancelationService.cancelCharge("charge123", payer.getId()));
+        assertThrows(ChargeNotFoundException.class, () -> chargeCancelationService.cancelCharge("Teste123", payer.getId()));
     }
 
     @Test
     void testCancelCharge_whenUserNotAuthorized_shouldThrowChargeException() {
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.of(charge));
+        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
 
-        assertThrows(ChargeNotAuthorizedException.class, () -> chargeCancelationService.cancelCharge("charge123", payer.getId()));
+        assertThrows(ChargeNotAuthorizedException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payer.getId()));
     }
 
     @Test
     void testCancelCharge_whenChargeAlreadyCanceled_shouldThrowChargeException() {
         charge.setStatus(ChargeStatus.CANCELED);
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.of(charge));
+        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
 
-        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge("charge123", payee.getId()));
+        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
     }
 
 
@@ -101,12 +109,12 @@ class ChargeCancellationServiceTest {
     void testCancelCharge_whenPaymentMethodBalance_shouldCancelCorrectly() {
         payee.setBalance(BigDecimal.valueOf(1000.0));
         charge.setPaymentMethod(PaymentMethod.BALANCE);
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.of(charge));
+        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
 
-        chargeCancelationService.cancelCharge("charge123", payee.getId());
+        chargeCancelationService.cancelCharge(charge.getId(), payee.getId());
 
         assertEquals(ChargeStatus.CANCELED, charge.getStatus());
-        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge("charge123", payee.getId()));
+        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
     }
 
     @Test
@@ -114,13 +122,13 @@ class ChargeCancellationServiceTest {
         charge.setPaymentMethod(PaymentMethod.CREDIT_CARD);
         charge.setStatus(ChargeStatus.PAID);
 
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.of(charge));
+        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
         when(externalAuthorizerClient.authorize()).thenReturn(true);
 
         doNothing().when(balanceService).debit(payee, charge.getAmount());
         doNothing().when(balanceService).credit(payer, charge.getAmount());
 
-        chargeCancelationService.cancelCharge("charge123", payee.getId());
+        chargeCancelationService.cancelCharge(charge.getId(), payee.getId());
 
         assertEquals(ChargeStatus.CANCELED, charge.getStatus());
         verify(externalAuthorizerClient).authorize();
@@ -133,10 +141,10 @@ class ChargeCancellationServiceTest {
         charge.setPaymentMethod(PaymentMethod.CREDIT_CARD);
         charge.setStatus(ChargeStatus.PAID);
 
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.of(charge));
+        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
         when(externalAuthorizerClient.authorize()).thenReturn(false);
 
-        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge("charge123", payee.getId()));
+        assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
         assertEquals(ChargeStatus.PAID, charge.getStatus());
 
         verify(externalAuthorizerClient).authorize();
@@ -151,8 +159,9 @@ class ChargeCancellationServiceTest {
         charge.setPaymentMethod(PaymentMethod.BALANCE);
         charge.setStatus(ChargeStatus.PAID);
 
-        when(chargeRepository.findById("charge123")).thenReturn(Optional.of(charge));
+        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
 
-        assertThrows(BalanceNoBalanceException.class, () -> chargeCancelationService.cancelCharge("charge123", payee.getId()));
+        assertThrows(BalanceInsufficientException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
+        verify(chargeRepository, times(1)).findById(charge.getId());
     }
 }

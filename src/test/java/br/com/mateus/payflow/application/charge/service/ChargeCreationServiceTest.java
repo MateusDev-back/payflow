@@ -9,6 +9,7 @@ import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
 import br.com.mateus.payflow.domain.charge.model.ChargeEntity;
 import br.com.mateus.payflow.enums.charge.ChargeStatus;
+import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,15 +37,20 @@ class ChargeCreationServiceTest {
 
     @BeforeEach
     void setUp() {
+        Faker faker = new Faker();
+
+        Long payeeId = faker.number().randomNumber();
+        Long payerId = faker.number().randomNumber();
+
         payee = new UserEntity();
-        payee.setId(1L);
-        payee.setEmail("payee@example.com");
-        payee.setCpf("12345678900");
+        payee.setId(payeeId);
+        payee.setEmail(faker.internet().emailAddress());
+        payee.setCpf(faker.number().digits(11));
 
         payer = new UserEntity();
-        payer.setId(2L);
-        payer.setEmail("payer@example.com");
-        payer.setCpf("98765432100");
+        payer.setId(payerId);
+        payer.setEmail(faker.internet().emailAddress());
+        payer.setCpf(faker.number().digits(11));
 
         chargeDTO = new ChargeDTO();
         chargeDTO.setAmount(BigDecimal.valueOf(100));

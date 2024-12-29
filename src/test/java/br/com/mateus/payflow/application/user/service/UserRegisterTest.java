@@ -2,9 +2,9 @@ package br.com.mateus.payflow.application.user.service;
 
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
-import br.com.mateus.payflow.domain.user.service.UserService;
 import br.com.mateus.payflow.common.exception.user.CpfAlreadyExistsException;
 import br.com.mateus.payflow.common.exception.user.EmailAlreadyExistsException;
+import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,16 +27,18 @@ class UserRegisterTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserService userService;
+    private UserRegisterService userRegisterService;
 
     private UserEntity validUser;
 
     @BeforeEach
     void setUp() {
+        Faker faker = new Faker();
+
         validUser = new UserEntity();
-        validUser.setCpf("46871326855");
-        validUser.setEmail("test@example.com");
-        validUser.setPassword("password123");
+        validUser.setCpf(faker.number().digits(11));
+        validUser.setEmail(faker.internet().emailAddress());
+        validUser.setPassword(faker.internet().password());
     }
 
     @Test
@@ -46,7 +48,7 @@ class UserRegisterTest {
         when(userRepository.save(validUser)).thenReturn(validUser);
         when(passwordEncoder.encode(validUser.getPassword())).thenReturn("encodedPassword");
 
-        UserEntity savedUser = userService.save(validUser);
+        UserEntity savedUser = userRegisterService.save(validUser);
 
         assertNotNull(savedUser);
         assertEquals("encodedPassword", savedUser.getPassword());
@@ -57,7 +59,7 @@ class UserRegisterTest {
     void testSaveUser_whenCpfAlreadyExists_shouldThrowCpfAlreadyExistsException() {
         when(userRepository.existsByCpf(validUser.getCpf())).thenReturn(true);
 
-        assertThrows(CpfAlreadyExistsException.class, () -> userService.save(validUser));
+        assertThrows(CpfAlreadyExistsException.class, () -> userRegisterService.save(validUser));
     }
 
     @Test
@@ -65,6 +67,6 @@ class UserRegisterTest {
         when(userRepository.existsByCpf(validUser.getCpf())).thenReturn(false);
         when(userRepository.existsByEmail(validUser.getEmail())).thenReturn(true);
 
-        assertThrows(EmailAlreadyExistsException.class, () -> userService.save(validUser));
+        assertThrows(EmailAlreadyExistsException.class, () -> userRegisterService.save(validUser));
     }
 }
