@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.mateus.payflow.application.user.dto.UserRegisterRequestDTO;
 import br.com.mateus.payflow.application.user.mapper.UserMapper;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
-import br.com.mateus.payflow.domain.user.service.UserService;
+import br.com.mateus.payflow.application.user.service.UserRegisterService;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,16 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/payflow/v1/users")
 public class UserRegisterController {
 
-    private final UserService userService;
+    private final UserRegisterService userRegisterService;
 
-    public UserRegisterController(UserService userService) {
-        this.userService = userService;
+    public UserRegisterController(UserRegisterService userRegisterService) {
+        this.userRegisterService = userRegisterService;
     }
 
     @PostMapping("/signup")
     public UserEntity register(@Valid @RequestBody UserRegisterRequestDTO dto) {
-        var userEntity = UserMapper.toEntity(dto);
-        var savedUser = userService.save(userEntity);
-        return savedUser;
+        return userRegisterService.save(UserMapper.toEntity(dto));
     }
 }
