@@ -1,5 +1,6 @@
 package br.com.mateus.payflow.application.user.service;
 
+import br.com.mateus.payflow.application.user.dto.UserResponseDTO;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
 import br.com.mateus.payflow.common.exception.user.CpfAlreadyExistsException;
@@ -48,10 +49,13 @@ class UserRegisterTest {
         when(userRepository.save(validUser)).thenReturn(validUser);
         when(passwordEncoder.encode(validUser.getPassword())).thenReturn("encodedPassword");
 
-        UserEntity savedUser = userRegisterService.save(validUser);
+        UserResponseDTO savedUserResponse = userRegisterService.save(validUser);
 
-        assertNotNull(savedUser);
-        assertEquals("encodedPassword", savedUser.getPassword());
+        assertNotNull(savedUserResponse);
+
+        assertEquals("User created successfully", savedUserResponse.getMessage());
+        assertEquals("success", savedUserResponse.getStatus());
+
         verify(userRepository).save(validUser);
     }
 

@@ -1,12 +1,16 @@
 package br.com.mateus.payflow.application.user.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class UserResponseDTO {
-    private Long id;
-    private String name;
-    private String cpf;
-    private String email;
-    private String password;
+    private String status;
+    private String message;
+
+    public UserResponseDTO() {
+        this.message = getMessage();
+        this.status = getStatus();
+    }
 }

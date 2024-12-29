@@ -25,12 +25,12 @@ public class AuthUserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<Object> signin(@RequestBody UserLoginRequestDTO userLoginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> signin(@RequestBody UserLoginRequestDTO userLoginRequestDTO) {
         try {
             LoginResponseDTO loginResponseDTO = authService.execute(userLoginRequestDTO);
             return ResponseEntity.ok(loginResponseDTO);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponseDTO(null, e.getMessage()));
         }
     }
 }
