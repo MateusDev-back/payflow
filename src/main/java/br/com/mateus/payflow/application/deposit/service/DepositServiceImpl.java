@@ -1,7 +1,7 @@
 package br.com.mateus.payflow.application.deposit.service;
 
 import br.com.mateus.payflow.application.deposit.dto.DepositDTO;
-import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
+import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.common.exception.authorizer.ExternalAuthorizerDepositException;
 import br.com.mateus.payflow.common.exception.deposit.DepositAmountInvalidException;
 import br.com.mateus.payflow.common.exception.user.UserNotFoundException;
@@ -16,12 +16,12 @@ import java.math.BigDecimal;
 public class DepositServiceImpl implements DepositService {
 
     private final UserRepository userRepository;
-    private final ExternalAuthorizerClient externalAuthorizerClient;
+    private final HttpExternalAuthorizerClient httpExternalAuthorizerClient;
 
     @Autowired
-    public DepositServiceImpl(UserRepository userRepository, ExternalAuthorizerClient externalAuthorizerClient) {
+    public DepositServiceImpl(UserRepository userRepository, HttpExternalAuthorizerClient httpExternalAuthorizerClient) {
         this.userRepository = userRepository;
-        this.externalAuthorizerClient = externalAuthorizerClient;
+        this.httpExternalAuthorizerClient = httpExternalAuthorizerClient;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class DepositServiceImpl implements DepositService {
 
         validateDepositAmount(dto.getAmount());
 
-        if (!externalAuthorizerClient.authorize()) {
+        if (!httpExternalAuthorizerClient.authorize()) {
             throw new ExternalAuthorizerDepositException();
         }
 

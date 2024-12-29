@@ -2,7 +2,8 @@ package br.com.mateus.payflow.application.charge.service;
 
 import br.com.mateus.payflow.application.balance.service.BalanceService;
 import br.com.mateus.payflow.application.charge.dto.ChargeDTO;
-import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
+import br.com.mateus.payflow.common.exception.charge.ChargeStatusException;
+import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotAuthorizedException;
@@ -19,13 +20,13 @@ import java.time.LocalDateTime;
 @Service
 public class ChargeCancelationService {
 
-    private final ExternalAuthorizerClient externalAuthorizerClient;
+    private final HttpExternalAuthorizerClient httpExternalAuthorizerClient;
     private final BalanceService balanceService;
     private final ChargeRepository chargeRepository;
 
     @Autowired
-    public ChargeCancelationService(ExternalAuthorizerClient externalAuthorizerClient, BalanceService balanceService, ChargeRepository chargeRepository) {
-        this.externalAuthorizerClient = externalAuthorizerClient;
+    public ChargeCancelationService(HttpExternalAuthorizerClient httpExternalAuthorizerClient, BalanceService balanceService, ChargeRepository chargeRepository) {
+        this.httpExternalAuthorizerClient = httpExternalAuthorizerClient;
         this.balanceService = balanceService;
         this.chargeRepository = chargeRepository;
     }
@@ -40,7 +41,7 @@ public class ChargeCancelationService {
 
 
         if (ChargeStatus.CANCELED == charge.getStatus()) {
-            throw new ChargeException("Charge already canceled");
+            throw new ChargeStatusException("Charge already canceled");
         }
 
         switch (charge.getStatus()) {
@@ -85,7 +86,7 @@ public class ChargeCancelationService {
     }
 
     public void cancelChargePaidCreditCard(ChargeEntity charge) {
-        if (!externalAuthorizerClient.authorize()) {
+        if (!httpExternalAuthorizerClient.authorize()) {
             throw new ChargeException("Error authorizing cancellation");
         }
         balanceService.debit(charge.getPayee(), charge.getAmount());

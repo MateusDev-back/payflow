@@ -6,7 +6,7 @@ import br.com.mateus.payflow.common.exception.authorizer.ExternalAuthorizerDepos
 import br.com.mateus.payflow.common.exception.user.UserNotFoundException;
 import br.com.mateus.payflow.domain.user.model.UserEntity;
 import br.com.mateus.payflow.domain.user.repository.UserRepository;
-import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
+import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class DepositServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private ExternalAuthorizerClient externalAuthorizerClient;
+    private HttpExternalAuthorizerClient httpExternalAuthorizerClient;
 
     private DepositServiceImpl depositService;
 
@@ -38,7 +38,7 @@ class DepositServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        depositService = new DepositServiceImpl(userRepository, externalAuthorizerClient);
+        depositService = new DepositServiceImpl(userRepository, httpExternalAuthorizerClient);
 
         Faker faker = new Faker();
 
@@ -56,7 +56,7 @@ class DepositServiceImplTest {
     @Test
     void testCreateDeposit_Success() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(externalAuthorizerClient.authorize()).thenReturn(true);
+        when(httpExternalAuthorizerClient.authorize()).thenReturn(true);
 
         DepositDTO result = depositService.createDeposit(depositDTO, user.getId());
 
@@ -87,7 +87,7 @@ class DepositServiceImplTest {
     @Test
     void testCreateDeposit_AuthorizationFailed() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(externalAuthorizerClient.authorize()).thenReturn(false);
+        when(httpExternalAuthorizerClient.authorize()).thenReturn(false);
 
         ExternalAuthorizerDepositException exception = assertThrows(ExternalAuthorizerDepositException.class, () -> depositService.createDeposit(depositDTO, user.getId()));
         assertEquals("Error authorizing deposit", exception.getMessage());
