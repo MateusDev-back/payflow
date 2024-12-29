@@ -1,7 +1,7 @@
 package br.com.mateus.payflow.application.payment.service;
 
 import br.com.mateus.payflow.application.payment.factory.PaymentStrategyFactory;
-import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
+import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.application.payment.strategy.PaymentStrategy;
 import br.com.mateus.payflow.common.exception.authorizer.ExternalAuthorizerPaymentException;
 import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
@@ -44,7 +44,7 @@ class PaymentServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private ExternalAuthorizerClient externalAuthorizerClient;
+    private HttpExternalAuthorizerClient httpExternalAuthorizerClient;
 
     private ChargeEntity charge;
     private UserEntity payer;
@@ -100,8 +100,8 @@ class PaymentServiceTest {
     @Test
     void testPayCharge_WithCreditCard_ShouldPaySuccessfully() {
         when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
-        when(paymentStrategyFactory.getPaymentStrategy(PaymentMethod.CREDIT_CARD)).thenReturn(new CreditCardPaymentStrategy(externalAuthorizerClient));
-        when(externalAuthorizerClient.authorize()).thenReturn(true);
+        when(paymentStrategyFactory.getPaymentStrategy(PaymentMethod.CREDIT_CARD)).thenReturn(new CreditCardPaymentStrategy(httpExternalAuthorizerClient));
+        when(httpExternalAuthorizerClient.authorize()).thenReturn(true);
 
         paymentService.payCharge(charge.getId(), PaymentMethod.CREDIT_CARD);
 
@@ -112,8 +112,8 @@ class PaymentServiceTest {
     @Test
     void testPayCharge_WithCreditCard_AuthFailure_ShouldThrowRuntimeException() {
         when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
-        when(paymentStrategyFactory.getPaymentStrategy(PaymentMethod.CREDIT_CARD)).thenReturn(new CreditCardPaymentStrategy(externalAuthorizerClient));
-        when(externalAuthorizerClient.authorize()).thenReturn(false);
+        when(paymentStrategyFactory.getPaymentStrategy(PaymentMethod.CREDIT_CARD)).thenReturn(new CreditCardPaymentStrategy(httpExternalAuthorizerClient));
+        when(httpExternalAuthorizerClient.authorize()).thenReturn(false);
 
         assertThrows(ExternalAuthorizerPaymentException.class, () -> paymentService.payCharge(charge.getId(), PaymentMethod.CREDIT_CARD));
     }

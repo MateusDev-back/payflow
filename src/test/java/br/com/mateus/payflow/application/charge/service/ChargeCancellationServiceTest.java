@@ -1,7 +1,7 @@
 package br.com.mateus.payflow.application.charge.service;
 
 import br.com.mateus.payflow.application.balance.service.BalanceService;
-import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
+import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotAuthorizedException;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ChargeCancellationServiceTest {
 
     @Mock
-    private ExternalAuthorizerClient externalAuthorizerClient;
+    private HttpExternalAuthorizerClient httpExternalAuthorizerClient;
 
     @Mock
     private BalanceService balanceService;
@@ -123,7 +123,7 @@ class ChargeCancellationServiceTest {
         charge.setStatus(ChargeStatus.PAID);
 
         when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
-        when(externalAuthorizerClient.authorize()).thenReturn(true);
+        when(httpExternalAuthorizerClient.authorize()).thenReturn(true);
 
         doNothing().when(balanceService).debit(payee, charge.getAmount());
         doNothing().when(balanceService).credit(payer, charge.getAmount());
@@ -131,7 +131,7 @@ class ChargeCancellationServiceTest {
         chargeCancelationService.cancelCharge(charge.getId(), payee.getId());
 
         assertEquals(ChargeStatus.CANCELED, charge.getStatus());
-        verify(externalAuthorizerClient).authorize();
+        verify(httpExternalAuthorizerClient).authorize();
         verify(balanceService).debit(payee, charge.getAmount());
         verify(balanceService).credit(payer, charge.getAmount());
     }
@@ -142,12 +142,12 @@ class ChargeCancellationServiceTest {
         charge.setStatus(ChargeStatus.PAID);
 
         when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
-        when(externalAuthorizerClient.authorize()).thenReturn(false);
+        when(httpExternalAuthorizerClient.authorize()).thenReturn(false);
 
         assertThrows(ChargeException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payee.getId()));
         assertEquals(ChargeStatus.PAID, charge.getStatus());
 
-        verify(externalAuthorizerClient).authorize();
+        verify(httpExternalAuthorizerClient).authorize();
         verify(balanceService, never()).debit(any(), any());
         verify(balanceService, never()).credit(any(), any());
     }
