@@ -3,7 +3,7 @@ package br.com.mateus.payflow.application.charge.service;
 import br.com.mateus.payflow.application.balance.service.BalanceService;
 import br.com.mateus.payflow.application.charge.dto.ChargeDTO;
 import br.com.mateus.payflow.application.payment.integration.ExternalAuthorizerClient;
-import br.com.mateus.payflow.common.exception.balance.BalanceNoBalanceException;
+import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotAuthorizedException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotFoundException;
@@ -73,7 +73,7 @@ public class ChargeCancelationService {
 
     public void cancelChargePaidBalance(ChargeEntity charge) {
         if (charge.getPayee().getBalance().compareTo(charge.getAmount()) < 0) {
-            throw new BalanceNoBalanceException();
+            throw new BalanceInsufficientException();
         }
 
         try {

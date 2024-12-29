@@ -2,6 +2,8 @@ package br.com.mateus.payflow.application.payment.service;
 
 import java.time.LocalDateTime;
 
+import br.com.mateus.payflow.common.exception.charge.ChargeNotFoundException;
+import br.com.mateus.payflow.common.exception.charge.ChargeStatusException;
 import org.springframework.stereotype.Service;
 
 import br.com.mateus.payflow.application.payment.factory.PaymentStrategyFactory;
@@ -30,14 +32,14 @@ public class PaymentService {
     @Transactional
     public void payCharge(String chargeId, PaymentMethod method) {
         ChargeEntity charge = chargeRepository.findById(chargeId)
-                .orElseThrow(() -> new RuntimeException("Charge not found"));
+                .orElseThrow(ChargeNotFoundException::new);
 
         if (charge.getStatus() == ChargeStatus.PAID) {
-            throw new RuntimeException("Charge already paid");
+            throw new ChargeStatusException("Charge already paid");
         }
 
         if (charge.getStatus() == ChargeStatus.CANCELED) {
-            throw new RuntimeException("Charge already canceled");
+            throw new ChargeStatusException("Charge already canceled");
         }
 
         PaymentStrategy strategy = paymentStrategyFactory.getPaymentStrategy(method);

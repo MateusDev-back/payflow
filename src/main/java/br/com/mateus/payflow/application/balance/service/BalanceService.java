@@ -2,6 +2,7 @@ package br.com.mateus.payflow.application.balance.service;
 
 import java.math.BigDecimal;
 
+import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,9 @@ public class BalanceService implements UserBalanceRepository {
 
     @Override
     public void debit(UserEntity user, BigDecimal amount) {
+        if (user.getBalance().compareTo(amount) < 0) {
+            throw new BalanceInsufficientException();
+        }
 
         user.setBalance(user.getBalance().subtract(amount));
         userRepository.save(user);
