@@ -22,7 +22,7 @@ public class BalanceService implements UserBalanceRepository {
 
     @Override
     public void debit(UserEntity user, BigDecimal amount) {
-        if (user.getBalance().compareTo(amount) < 0) {
+        if (user.getBalance().compareTo(amount) <= 0) {
             throw new BalanceInsufficientException();
         }
 

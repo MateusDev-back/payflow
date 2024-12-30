@@ -91,13 +91,6 @@ class ChargeCancellationServiceTest {
     }
 
     @Test
-    void testCancelCharge_whenUserNotAuthorized_shouldThrowChargeException() {
-        when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));
-
-        assertThrows(ChargeNotAuthorizedException.class, () -> chargeCancelationService.cancelCharge(charge.getId(), payer.getId()));
-    }
-
-    @Test
     void testCancelCharge_whenChargeAlreadyCanceled_shouldThrowChargeException() {
         charge.setStatus(ChargeStatus.CANCELED);
         when(chargeRepository.findById(charge.getId())).thenReturn(Optional.of(charge));

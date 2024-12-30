@@ -6,7 +6,6 @@ import br.com.mateus.payflow.common.exception.charge.ChargeStatusException;
 import br.com.mateus.payflow.infrastructure.HttpExternalAuthorizerClient;
 import br.com.mateus.payflow.common.exception.balance.BalanceInsufficientException;
 import br.com.mateus.payflow.common.exception.charge.ChargeException;
-import br.com.mateus.payflow.common.exception.charge.ChargeNotAuthorizedException;
 import br.com.mateus.payflow.common.exception.charge.ChargeNotFoundException;
 import br.com.mateus.payflow.domain.charge.model.ChargeEntity;
 import br.com.mateus.payflow.domain.charge.repository.ChargeRepository;
@@ -34,11 +33,6 @@ public class ChargeCancelationService {
     public ChargeDTO cancelCharge(String chargeId, Long userId) {
         ChargeEntity charge = chargeRepository.findById(chargeId)
                 .orElseThrow(ChargeNotFoundException::new);
-
-        if (charge.getPayer().getId().equals(userId)) {
-            throw new ChargeNotAuthorizedException();
-        }
-
 
         if (ChargeStatus.CANCELED == charge.getStatus()) {
             throw new ChargeStatusException("Charge already canceled");
@@ -78,8 +72,8 @@ public class ChargeCancelationService {
         }
 
         try {
-            balanceService.debit(charge.getPayer(), charge.getAmount());
-            balanceService.credit(charge.getPayee(), charge.getAmount());
+            balanceService.debit(charge.getPayee(), charge.getAmount());
+            balanceService.credit(charge.getPayer(), charge.getAmount());
         } catch (Exception ex) {
             throw new ChargeException("Error canceling charge");
         }
