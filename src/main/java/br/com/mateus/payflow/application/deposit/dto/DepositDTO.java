@@ -16,11 +16,8 @@ public class DepositDTO {
     @NotNull(message = "The amount cannot be empty.")
     private BigDecimal amount;
 
-    @NotNull(message = "The user ID cannot be empty.")
-    private Long userId;
 
     public DepositDTO(UserEntity user) {
-        this.userId = user.getId();
         this.amount = user.getBalance();
     }
 }
