@@ -20,7 +20,8 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/payflow/v1/users/signup").permitAll()
-                            .requestMatchers("/payflow/v1/auth/signin").permitAll();
+                            .requestMatchers("/payflow/v1/auth/signin").permitAll()
+                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityfilter, BasicAuthenticationFilter.class);

@@ -50,7 +50,6 @@ class DepositServiceImplTest {
 
         depositDTO = new DepositDTO();
         depositDTO.setAmount(BigDecimal.valueOf(50.0));
-        depositDTO.setUserId(user.getId());
     }
 
     @Test
